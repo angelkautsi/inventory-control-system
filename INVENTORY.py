@@ -103,4 +103,19 @@ def get_book_by_title(title):
     conn.close()
 #get_book_by_title()
 
+def delete_book(book_id):
+    conn = sqlite3.connect('angel_store.db')
+    a = conn.cursor()
+
+    a.execute("DELETE FROM books WHERE book_id = ?", (book_id,))
+    conn.commit()
+
+    if a.rowcount > 0:
+        print(f"❌ Book ID {book_id} has been deleted.")
+    else:
+        print(f"⚠️ No book found with ID {book_id}.")
+
+    conn.close()
+delete_book(4)
+show_all_books()
 
