@@ -63,7 +63,8 @@ def show_all_books():
 
     conn.close()
 
-show_all_books() #function
+show_all_books() # This function displays all the books in the database
+
 
 #updating book details
 def update_book_details(book_id, new_title=None, new_genre=None, new_price=None):
@@ -97,7 +98,7 @@ def get_book_by_title(title):
     if book:
         print(f"Found Book:\nID: {book[0]} | Title: {book[1]} | Genre: {book[2]} | Price: {book[3]} | Quantity: {book[4]}")
     else:
-        print(f"No book found with title '{title}'.")
+        print(f"\nNo book found with title '{title}'.")
 
     conn.close()
 #get_book_by_title()
