@@ -7,7 +7,6 @@
     <list default="true" id="458c1e9c-5336-4f4c-a26f-934b915ad492" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/INVENTORY.py" beforeDir="false" afterPath="$PROJECT_DIR$/INVENTORY.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/angel_store.db" beforeDir="false" afterPath="$PROJECT_DIR$/angel_store.db" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,6 +23,18 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
+  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
+  "lastFilter": {
+    "state": "OPEN",
+    "assignee": "mailla068"
+  }
+}]]></component>
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "https://github.com/mailla068/inventory-control-system.git",
+    "accountId": "403f7337-aabb-4934-ab6b-f820a1190a6b"
+  }
+}]]></component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 2
 }]]></component>

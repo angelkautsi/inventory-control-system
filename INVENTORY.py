@@ -4,9 +4,9 @@ def create_table():
     conn = sqlite3.connect('angel_store.db')
     a = conn.cursor()
 
-    # Create the table if it doesn't exist
+    # Creating the table
     a.execute('''
-        CREATE TABLE IF NOT EXISTS books (
+        CREATE TABLE books (
             book_id INTEGER PRIMARY KEY,
             book_title TEXT NOT NULL,
             genre TEXT NOT NULL,
@@ -18,10 +18,10 @@ def create_table():
     conn.commit()
     conn.close()
 
-# Call the function
+# Calling the function
 create_table()
 
-#adding items
+#adding the items
 def add_book(book_id, book_title, genre, price, quantity):
         conn = sqlite3.connect('angel_store.db')
         a = conn.cursor()
@@ -50,9 +50,9 @@ def show_all_books():
 
     # Query all books from the database
     a.execute("SELECT * FROM books") #we are selecting from the table
-    books = a.fetchall()
+    books = a.fetchall() #this is getting all entries
 
-    # Display the books using if-else condition statements
+    # Displaying the books using if-else condition statements
     if books:
         print("\n--- All Books in Inventory ---")
         for book in books:
@@ -84,8 +84,6 @@ def update_book_details(book_id, new_title=None, new_genre=None, new_price=None)
 
 update_book_details(2, new_title="Twilight Saga", new_price=450.0)
 
-#delete_book() function
-
 # Getting a book by its title
 def get_book_by_title(title):
     conn = sqlite3.connect('angel_store.db')
@@ -102,6 +100,7 @@ def get_book_by_title(title):
     conn.close()
 #get_book_by_title()
 
+#deleting entries
 def delete_book(book_id):
     conn = sqlite3.connect('angel_store.db')
     a = conn.cursor()
@@ -110,9 +109,9 @@ def delete_book(book_id):
     conn.commit()
 
     if a.rowcount > 0:
-        print(f"❌ Book ID {book_id} has been deleted.")
+        print(f"Book ID {book_id} has been deleted.")
     else:
-        print(f"⚠️ No book found with ID {book_id}.")
+        print(f"No book found with ID {book_id}.")
 
     conn.close()
 #delete_book(4)
