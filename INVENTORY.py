@@ -35,8 +35,7 @@ def add_book(book_id, book_title, genre, price, quantity):
             print("This Book ID already exists. Try a different one.")
 
         conn.close()
-        # --- Test Example (You can remove this after testing) ---
-        # Uncomment and change values to test
+
 add_book(1, "A Court of Thorns and Roses", "Fantasy", 550.0, 100)
 add_book(2, "Twilight", "Dark Romance", 420.0, 55)
 add_book(3, "Jack & Jill", "Suspence & crime", 600.0, 399)
@@ -116,6 +115,6 @@ def delete_book(book_id):
         print(f"⚠️ No book found with ID {book_id}.")
 
     conn.close()
-delete_book(4)
+#delete_book(4)
 show_all_books()
 
