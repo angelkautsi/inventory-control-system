@@ -19,7 +19,7 @@ def create_table():
     conn.close()
 
 # Calling the function
-create_table()
+#create_table()
 
 #adding the items
 def add_book(book_id, book_title, genre, price, quantity):
@@ -42,7 +42,7 @@ add_book(3, "Jack & Jill", "Suspence & crime", 600.0, 399)
 add_book(4, "Better Than The Movies", "YA Romance", 590.0, 5)
 
 
-create_table()
+#create_table()
 
 def show_all_books():
     conn = sqlite3.connect('angel_store.db')
@@ -115,5 +115,12 @@ def delete_book(book_id):
 
     conn.close()
 #delete_book(4)
+show_all_books()
+add_book(5, "Husbands", "Romance",79.0, 900)
+show_all_books()
+delete_book(101)
+show_all_books()
+get_book_by_title("Twilight Saga")
+update_book_details(2, "Twilight Swagger", "Fantasy", 100.0)
 show_all_books()
 
