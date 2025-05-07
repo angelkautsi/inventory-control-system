@@ -20,33 +20,69 @@ class MainMenu(Screen):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=50, spacing=20)
 
-        manage_button = Button(text="Manage Books", size_hint=(1, 0.5)) #creating manage books button
+        manage_button = Button(
+            text="Manage Books",
+            background_color=(0.4, 0.2, 0.6, 1),  # Deep Purple
+            color=(1, 1, 1, 1),
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2)
+        )
         manage_button.bind(on_press=self.go_to_books)
         layout.add_widget(manage_button)
 
-        update_button = Button(text="Update Book", size_hint=(1, 0.2))
+        update_button = Button(
+            text="Update Book",
+            background_color=(1, 0.6, 0.8, 1),  # Soft Pink
+            color=(0, 0, 0, 1),
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2)
+        )
         update_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'update'))
         layout.add_widget(update_button)
 
-        delete_button = Button(text="Delete Book", size_hint=(1, 0.2))
+        delete_button = Button(
+            text="Delete Book",
+            background_color=(0.8, 0.0, 0.2, 1),  # Cherry Red
+            color=(1, 1, 1, 1),
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2)
+        )
         delete_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'delete'))
         layout.add_widget(delete_button)
 
-        search_button = Button(text="Search Book", size_hint=(1, 0.2))
+        search_button = Button(
+            text="Search Book",
+            background_color=(1, 0.6, 0.8, 1),  # Soft Pink
+            color=(0, 0, 0, 1),
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2)
+        )
         search_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'search'))
         layout.add_widget(search_button)
 
-        back_button = Button(text="Exit", size_hint=(1, 0.5))
+        back_button = Button(
+            text="Exit",
+            background_color=(0, 0, 0, 1),  # Black
+            color=(1, 0.8, 0.9, 1),  # Light pink text
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2)
+        )
         back_button.bind(on_press=lambda x: App.get_running_app().stop())
         layout.add_widget(back_button)
 
         self.add_widget(layout)
 
+    def go_to_books(self, instance):
+        self.manager.current = "book_inventory"
+
     def exit_app(self, instance):
         App.get_running_app().stop()
 
-    def go_to_books(self, instance):
-        self.manager.current = "book_inventory"
 
 class UpdateBookScreen(Screen):
     def __init__(self, **kwargs):
@@ -58,8 +94,13 @@ class UpdateBookScreen(Screen):
         self.new_book_name_input = TextInput(hint_text="Enter New Book Name", multiline=False)
         self.new_book_price_input = TextInput(hint_text="Enter New Book Price", multiline=False)
 
-        save_button = Button(text="Save Changes", size_hint=(1, 0.3))
-        save_button.bind(on_press=self.save_changes)
+        save_button = Button(
+            text="Save Changes",
+            background_color=(0.4, 0.2, 0.6, 1),  # Deep Purple
+            color=(1, 1, 1, 1),
+            font_size=20,
+            bold=True
+        )
 
         cancel_button = Button(text="Cancel", size_hint=(1, 0.3))
         cancel_button.bind(on_press=self.go_back)
@@ -218,9 +259,13 @@ class DeleteBookScreen(Screen):
         self.book_id_input = TextInput(hint_text='Enter Book ID to Delete', multiline=False)
         layout.add_widget(self.book_id_input)
 
-        delete_button = Button(text='Delete Book')
-        delete_button.bind(on_press=self.delete_selected_book)
-        layout.add_widget(delete_button)
+        delete_button = Button(
+            text="Delete Book",
+            background_color=(0.8, 0.0, 0.2, 1),  # Cherry Red
+            color=(1, 1, 1, 1),
+            font_size=20,
+            bold=True
+        )
 
         back_button = Button(text="Back to Main Menu")
         back_button.bind(on_press=self.go_back)
@@ -252,9 +297,13 @@ class SearchBookScreen(Screen):
         self.search_input = TextInput(hint_text="Enter Title or Genre to search", multiline=False)
         layout.add_widget(self.search_input)
 
-        search_button = Button(text="Search", size_hint=(1, 0.3))
-        search_button.bind(on_press=self.search_books)
-        layout.add_widget(search_button)
+        search_button = Button(
+            text="Search",
+            background_color=(1, 0.6, 0.8, 1),  # Soft Pink
+            color=(0, 0, 0, 1),
+            font_size=20,
+            bold=True
+        )
 
         back_button = Button(text="Back to Main Menu", size_hint=(1, 0.3))
         back_button.bind(on_press=self.go_back)
