@@ -10,6 +10,8 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 import sqlite3
 from kivy.app import App
+from INVENTORY import delete_book
+
 
 class MainMenu(Screen):
     def __init__(self, **kwargs):
@@ -23,6 +25,10 @@ class MainMenu(Screen):
         update_button = Button(text="Update Book", size_hint=(1, 0.2))
         update_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'update'))
         layout.add_widget(update_button)
+
+        delete_button = Button(text="Delete Book", size_hint=(1, 0.2))
+        delete_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'delete'))
+        layout.add_widget(delete_button)
 
         back_button = Button(text="Exit", size_hint=(1, 0.5))
         back_button.bind(on_press=lambda x: App.get_running_app().stop())
@@ -198,12 +204,46 @@ class BookInventory(BoxLayout):
         else:
             self.output.text = "No books found in the inventory."
 
+class DeleteBookScreen(Screen):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        layout = BoxLayout(orientation='vertical', padding=20, spacing=20)
+
+        self.book_id_input = TextInput(hint_text='Enter Book ID to Delete', multiline=False)
+        layout.add_widget(self.book_id_input)
+
+        delete_button = Button(text='Delete Book')
+        delete_button.bind(on_press=self.delete_selected_book)
+        layout.add_widget(delete_button)
+
+        back_button = Button(text="Back to Main Menu")
+        back_button.bind(on_press=self.go_back)
+        layout.add_widget(back_button)
+
+        self.result_label = Label(text='')
+        layout.add_widget(self.result_label)
+
+        self.add_widget(layout)
+
+    def delete_selected_book(self, instance):
+        book_id = self.book_id_input.text.strip()
+        if book_id.isdigit():
+            delete_book(int(book_id))
+            self.result_label.text = f"Book ID {book_id} deleted successfully."
+        else:
+            self.result_label.text = "Invalid Book ID. Please enter a valid number."
+
+    def go_back(self, instance):
+        self.manager.current = 'main_menu'
+
+
 class InventoryApp(App):
     def build(self):
         sm = ScreenManager()
         sm.add_widget(MainMenu(name="main_menu"))
         sm.add_widget(BookInventoryScreen(name="book_inventory"))
         sm.add_widget(UpdateBookScreen(name='update'))
+        sm.add_widget(DeleteBookScreen(name="delete"))
 
         return sm
 
