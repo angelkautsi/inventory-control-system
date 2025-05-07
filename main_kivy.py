@@ -11,6 +11,8 @@ from kivy.uix.gridlayout import GridLayout
 import sqlite3
 from kivy.app import App
 from INVENTORY import delete_book
+from INVENTORY import delete_book, search_book_by_title, search_book_by_genre
+
 
 
 class MainMenu(Screen):
@@ -29,6 +31,10 @@ class MainMenu(Screen):
         delete_button = Button(text="Delete Book", size_hint=(1, 0.2))
         delete_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'delete'))
         layout.add_widget(delete_button)
+
+        search_button = Button(text="Search Book", size_hint=(1, 0.2))
+        search_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'search'))
+        layout.add_widget(search_button)
 
         back_button = Button(text="Exit", size_hint=(1, 0.5))
         back_button.bind(on_press=lambda x: App.get_running_app().stop())
@@ -236,6 +242,52 @@ class DeleteBookScreen(Screen):
     def go_back(self, instance):
         self.manager.current = 'main_menu'
 
+#this is for searching
+class SearchBookScreen(Screen):
+    def __init__(self, **kwargs):
+        super(SearchBookScreen, self).__init__(**kwargs)
+
+        layout = BoxLayout(orientation='vertical', padding=20, spacing=20)
+
+        self.search_input = TextInput(hint_text="Enter Title or Genre to search", multiline=False)
+        layout.add_widget(self.search_input)
+
+        search_button = Button(text="Search", size_hint=(1, 0.3))
+        search_button.bind(on_press=self.search_books)
+        layout.add_widget(search_button)
+
+        back_button = Button(text="Back to Main Menu", size_hint=(1, 0.3))
+        back_button.bind(on_press=self.go_back)
+        layout.add_widget(back_button)
+
+        self.result_label = Label(text='')
+        layout.add_widget(self.result_label)
+
+        self.add_widget(layout)
+
+    def search_books(self, instance):
+        search_text = self.search_input.text.strip()
+        if not search_text:
+            self.result_label.text = "Please enter a title or genre."
+            return
+
+        # Search both by title and genre
+        title_matches = search_book_by_title(search_text)
+        genre_matches = search_book_by_genre(search_text)
+
+        results = title_matches + genre_matches
+
+        if results:
+            result_text = "\n".join(
+                [f"ID: {b[0]} | Title: {b[1]} | Genre: {b[2]} | Price: {b[3]} | Quantity: {b[4]}" for b in results]
+            )
+            self.result_label.text = result_text
+        else:
+            self.result_label.text = "No matching books found."
+
+    def go_back(self, instance):
+        self.manager.current = 'main_menu'
+
 
 class InventoryApp(App):
     def build(self):
@@ -244,6 +296,7 @@ class InventoryApp(App):
         sm.add_widget(BookInventoryScreen(name="book_inventory"))
         sm.add_widget(UpdateBookScreen(name='update'))
         sm.add_widget(DeleteBookScreen(name="delete"))
+        sm.add_widget(SearchBookScreen(name="search"))
 
         return sm
 

@@ -64,6 +64,22 @@ def show_all_books():
 
 show_all_books() # This function displays all the books in the database
 
+def search_book_by_title(title):
+    conn = sqlite3.connect('angel_store.db')
+    a = conn.cursor()
+    a.execute("SELECT * FROM books WHERE book_title LIKE ?", ('%' + title + '%',))
+    books = a.fetchall()
+    conn.close()
+    return books
+
+def search_book_by_genre(genre):
+    conn = sqlite3.connect('angel_store.db')
+    a = conn.cursor()
+    a.execute("SELECT * FROM books WHERE genre LIKE ?", ('%' + genre + '%',))
+    books = a.fetchall()
+    conn.close()
+    return books
+
 
 #updating book details
 def update_book_details(book_id, new_title=None, new_genre=None, new_price=None):
