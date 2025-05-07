@@ -79,7 +79,7 @@ def update_book_details(book_id, new_title=None, new_genre=None, new_price=None)
         a.execute("UPDATE books SET price = ? WHERE book_id = ?", (new_price, book_id))
 
     conn.commit()
-    print(f"✅ Book ID {book_id} updated successfully.")
+    print(f"Book ID {book_id} updated successfully.")
     conn.close()
 
 update_book_details(2, new_title="Twilight Saga", new_price=450.0)
@@ -122,5 +122,9 @@ delete_book(101)
 show_all_books()
 get_book_by_title("Twilight Saga")
 update_book_details(2, "Twilight Swagger", "Fantasy", 100.0)
+show_all_books()
+add_book(6, "Bound by blood", "Dark romance", 890.0, 45)
+show_all_books()
+add_book(7, "Secrets of Willowdale", "Fantasy", 34.89, 333)
 show_all_books()
 

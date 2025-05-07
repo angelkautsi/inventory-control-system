@@ -1,4 +1,4 @@
-from kivy.app import App
+#from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 # from kivy.tools.report import title
 from kivy.uix.boxlayout import BoxLayout
@@ -9,6 +9,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 import sqlite3
+from kivy.app import App
 
 class MainMenu(Screen):
     def __init__(self, **kwargs):
@@ -19,17 +20,65 @@ class MainMenu(Screen):
         manage_button.bind(on_press=self.go_to_books)
         layout.add_widget(manage_button)
 
-        exit_button = Button(text="Exit", size_hint=(1, 0.5)) #for exit button
-        exit_button.bind(on_press=self.exit_app)
-        layout.add_widget(exit_button)
+        update_button = Button(text="Update Book", size_hint=(1, 0.2))
+        update_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'update'))
+        layout.add_widget(update_button)
+
+        back_button = Button(text="Exit", size_hint=(1, 0.5))
+        back_button.bind(on_press=lambda x: App.get_running_app().stop())
+        layout.add_widget(back_button)
 
         self.add_widget(layout)
+
+    def exit_app(self, instance):
+        App.get_running_app().stop()
 
     def go_to_books(self, instance):
         self.manager.current = "book_inventory"
 
-    def exit_app(self, instance):
-        App.get_running_app().stop()
+class UpdateBookScreen(Screen):
+    def __init__(self, **kwargs):
+        super(UpdateBookScreen, self).__init__(**kwargs) #update book class constructor
+
+        layout = BoxLayout(orientation='vertical', padding=20, spacing=20)
+
+        self.book_id_input = TextInput(hint_text="Enter Book ID to update", multiline=False)
+        self.new_book_name_input = TextInput(hint_text="Enter New Book Name", multiline=False)
+        self.new_book_price_input = TextInput(hint_text="Enter New Book Price", multiline=False)
+
+        save_button = Button(text="Save Changes", size_hint=(1, 0.3))
+        save_button.bind(on_press=self.save_changes)
+
+        cancel_button = Button(text="Cancel", size_hint=(1, 0.3))
+        cancel_button.bind(on_press=self.go_back)
+
+        layout.add_widget(Label(text="Update Book Details", font_size=24))
+        layout.add_widget(self.book_id_input)
+        layout.add_widget(self.new_book_name_input)
+        layout.add_widget(self.new_book_price_input)
+        layout.add_widget(save_button)
+        layout.add_widget(cancel_button)
+
+        self.add_widget(layout)
+
+    def save_changes(self, instance):
+        from INVENTORY import update_book_details  # import inventory file
+        book_id = self.book_id_input.text
+        book_name = self.new_book_name_input.text
+        book_price = self.new_book_price_input.text
+
+        if book_id:
+            update_book_details(
+                int(book_id),
+                book_name if book_name else None,
+                float(book_price) if book_price else None
+            )
+
+        self.manager.current = 'main_menu'  # After saving, go back to main screen
+
+    def go_back(self, instance):
+        self.manager.current = 'main_menu'  # Just go back without saving
+
 
 class BookInventoryScreen(Screen):
     def __init__(self, **kwargs):
@@ -46,7 +95,7 @@ class BookInventoryScreen(Screen):
     def go_back(self,instance):
         self.manager.current = "main_menu"
 
-# here is where i create buttons
+# here is where I create buttons
 class BookInventory(BoxLayout):
     def __init__(self, **kwargs):
         super().__init__(orientation='vertical', **kwargs)
@@ -101,11 +150,11 @@ class BookInventory(BoxLayout):
         except Exception as e:
             self.output.text = f"Error: {e}"
 
-            # Clear fields after adding
-            self.title_input.text = ""
-            self.genre_input.text = ""
-            self.price_input.text = ""
-            self.quantity_input.text = ""
+         # Clear fields after adding /trying (success/error
+        self.title_input.text = ""
+        self.genre_input.text = ""
+        self.price_input.text = ""
+        self.quantity_input.text = ""
 
     def show_books(self, instance):
         self.cursor.execute("SELECT * FROM books")
@@ -120,7 +169,7 @@ class BookInventory(BoxLayout):
             headers = ["ID", "Title", "Genre", "Price", "Quantity"]
             for header in headers:
                 layout.add_widget(Label(
-                    text=header, bold=True, halign="center", valign="middle",
+                    text=f"[b]{header}[/b]", markup=True, halign="center", valign="middle",
                     size_hint_y=None, height=20, text_size=(150, None)
                 ))
 
@@ -154,6 +203,8 @@ class InventoryApp(App):
         sm = ScreenManager()
         sm.add_widget(MainMenu(name="main_menu"))
         sm.add_widget(BookInventoryScreen(name="book_inventory"))
+        sm.add_widget(UpdateBookScreen(name='update'))
+
         return sm
 
 if __name__ == '__main__':
