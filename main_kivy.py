@@ -268,22 +268,66 @@ class SearchBookScreen(Screen):
     def search_books(self, instance):
         search_text = self.search_input.text.strip()
         if not search_text:
-            self.result_label.text = "Please enter a title or genre."
+            self.show_popup("No Input", "Please enter a title or genre to search.")
             return
 
-        # Search both by title and genre
         title_matches = search_book_by_title(search_text)
         genre_matches = search_book_by_genre(search_text)
-
         results = title_matches + genre_matches
 
         if results:
-            result_text = "\n".join(
-                [f"ID: {b[0]} | Title: {b[1]} | Genre: {b[2]} | Price: {b[3]} | Quantity: {b[4]}" for b in results]
-            )
-            self.result_label.text = result_text
+            layout = GridLayout(cols=5, spacing=10, size_hint_y=None, padding=[10, 10])
+            layout.bind(minimum_height=layout.setter('height'))
+
+            # Add Headers
+            headers = ["ID", "Title", "Genre", "Price", "Quantity"]
+            for header in headers:
+                layout.add_widget(Label(
+                    text=f"[b]{header}[/b]", markup=True, halign="center", valign="middle",
+                    size_hint_y=None, height=30, text_size=(150, None)
+                ))
+
+            # Add Book Details
+            for book in results:
+                layout.add_widget(
+                    Label(text=str(book[0]), halign="center", valign="middle", size_hint_y=None, height=40))
+                layout.add_widget(Label(text=book[1], halign="left", valign="middle", size_hint_y=None, height=40,
+                                        text_size=(261, None)))
+                layout.add_widget(Label(text=book[2], halign="left", valign="middle", size_hint_y=None, height=40,
+                                        text_size=(150, None)))
+                layout.add_widget(
+                    Label(text=str(book[3]), halign="center", valign="middle", size_hint_y=None, height=40))
+                layout.add_widget(
+                    Label(text=str(book[4]), halign="center", valign="middle", size_hint_y=None, height=40))
+
+            # ScrollView to make it scrollable
+            scroll = ScrollView(size_hint=(1, 1))
+            scroll.add_widget(layout)
+
+            popup_layout = BoxLayout(orientation='vertical')
+            popup_layout.add_widget(scroll)
+
+            close_button = Button(text="Close", size_hint=(1, 0.1))
+            popup_layout.add_widget(close_button)
+
+            popup = Popup(title="Search Results", content=popup_layout,
+                          size_hint=(0.95, 0.9))
+            close_button.bind(on_press=popup.dismiss)
+            popup.open()
+
         else:
-            self.result_label.text = "No matching books found."
+            self.show_popup("No Results", "No matching books found.")
+
+    def show_popup(self, title, message):
+        popup_content = BoxLayout(orientation='vertical', padding=50, spacing=50)
+        popup_content.add_widget(Label(text=message))
+
+        close_button = Button(text="Close", size_hint=(1, 0.2))
+        popup_content.add_widget(close_button)
+
+        popup = Popup(title=title, content=popup_content, size_hint=(0.9, 0.4))
+        close_button.bind(on_press=popup.dismiss)
+        popup.open()
 
     def go_back(self, instance):
         self.manager.current = 'main_menu'
