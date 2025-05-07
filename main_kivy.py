@@ -10,70 +10,64 @@ from kivy.uix.scrollview import ScrollView
 from kivy.uix.gridlayout import GridLayout
 import sqlite3
 from kivy.app import App
-from INVENTORY import delete_book
+#from INVENTORY import delete_book
 from INVENTORY import delete_book, search_book_by_title, search_book_by_genre
+from kivy.uix.widget import Widget
+from kivy.graphics import Rectangle, Color
+from kivy.core.window import Window
 
 
+# Gradient background
+class GradientBackground(Widget):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        with self.canvas.before:
+            Color(0.5, 0.2, 0.7, 1)  # Deep purple
+            self.rect = Rectangle(size=Window.size, pos=self.pos)
+        self.bind(size=self.update_rect, pos=self.update_rect)
+        Window.bind(size=self.update_rect)
+
+    def update_rect(self, *args):
+        self.rect.size = Window.size
+        self.rect.pos = self.pos
 
 class MainMenu(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=50, spacing=20)
 
-        manage_button = Button(
-            text="Manage Books",
-            background_color=(0.4, 0.2, 0.6, 1),  # Deep Purple
-            color=(1, 1, 1, 1),
-            font_size=22,
-            bold=True,
-            size_hint=(1, 0.2)
-        )
+        # Common button style
+        def create_button(text, bg_color, text_color):
+            return Button(
+                text=text,
+                background_color=bg_color,
+                color=text_color,
+                font_size=22,
+                bold=True,
+                size_hint=(1, 0.2),
+                background_normal='',
+                background_down=''
+            )
+
+        manage_button = create_button("Manage Books", (1, 0.75, 0.8, 1), (0, 0, 0, 1))  # pink bg, black text
         manage_button.bind(on_press=self.go_to_books)
         layout.add_widget(manage_button)
 
-        update_button = Button(
-            text="Update Book",
-            background_color=(1, 0.6, 0.8, 1),  # Soft Pink
-            color=(0, 0, 0, 1),
-            font_size=22,
-            bold=True,
-            size_hint=(1, 0.2)
-        )
+        update_button = create_button("Update Book", (1, 0.75, 0.8, 1), (0, 0, 0, 1))
         update_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'update'))
         layout.add_widget(update_button)
 
-        delete_button = Button(
-            text="Delete Book",
-            background_color=(0.8, 0.0, 0.2, 1),  # Cherry Red
-            color=(1, 1, 1, 1),
-            font_size=22,
-            bold=True,
-            size_hint=(1, 0.2)
-        )
+        delete_button = create_button("Delete Book", (0.8, 0, 0.2, 1), (1, 1, 1, 1))  # red bg, white text
         delete_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'delete'))
         layout.add_widget(delete_button)
 
-        search_button = Button(
-            text="Search Book",
-            background_color=(1, 0.6, 0.8, 1),  # Soft Pink
-            color=(0, 0, 0, 1),
-            font_size=22,
-            bold=True,
-            size_hint=(1, 0.2)
-        )
+        search_button = create_button("Search Book", (1, 0.75, 0.8, 1), (0, 0, 0, 1))
         search_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'search'))
         layout.add_widget(search_button)
 
-        back_button = Button(
-            text="Exit",
-            background_color=(0, 0, 0, 1),  # Black
-            color=(1, 0.8, 0.9, 1),  # Light pink text
-            font_size=22,
-            bold=True,
-            size_hint=(1, 0.2)
-        )
-        back_button.bind(on_press=lambda x: App.get_running_app().stop())
-        layout.add_widget(back_button)
+        exit_button = create_button("Exit", (0, 0, 0, 1), (1, 0.8, 0.9, 1))  # black bg, pink text
+        exit_button.bind(on_press=lambda x: App.get_running_app().stop())
+        layout.add_widget(exit_button)
 
         self.add_widget(layout)
 
@@ -93,22 +87,35 @@ class UpdateBookScreen(Screen):
         self.book_id_input = TextInput(hint_text="Enter Book ID to update", multiline=False)
         self.new_book_name_input = TextInput(hint_text="Enter New Book Name", multiline=False)
         self.new_book_price_input = TextInput(hint_text="Enter New Book Price", multiline=False)
+        self.new_genre_input = TextInput(hint_text="Enter genre", multiline=False)
 
         save_button = Button(
             text="Save Changes",
-            background_color=(0.4, 0.2, 0.6, 1),  # Deep Purple
+            background_color=(0.4, 0.2, 0.6, 1),
             color=(1, 1, 1, 1),
             font_size=20,
-            bold=True
+            bold=True,
+            background_normal='',
+            background_down=''
         )
+        save_button.bind(on_press=self.save_changes)
 
-        cancel_button = Button(text="Cancel", size_hint=(1, 0.3))
+        cancel_button = Button(
+            text="Cancel",
+            background_color=(0, 0, 0, 1),
+            color=(1, 0.8, 0.9, 1),
+            font_size=20,
+            bold=True,
+            background_normal='',
+            background_down=''
+        )
         cancel_button.bind(on_press=self.go_back)
 
         layout.add_widget(Label(text="Update Book Details", font_size=24))
         layout.add_widget(self.book_id_input)
         layout.add_widget(self.new_book_name_input)
         layout.add_widget(self.new_book_price_input)
+        layout.add_widget(self.new_genre_input)
         layout.add_widget(save_button)
         layout.add_widget(cancel_button)
 
@@ -119,12 +126,14 @@ class UpdateBookScreen(Screen):
         book_id = self.book_id_input.text
         book_name = self.new_book_name_input.text
         book_price = self.new_book_price_input.text
+        genre = self.new_genre_input.text
 
         if book_id:
             update_book_details(
                 int(book_id),
                 book_name if book_name else None,
-                float(book_price) if book_price else None
+                float(book_price) if book_price else None,
+                genre if genre else None
             )
 
         self.manager.current = 'main_menu'  # After saving, go back to main screen
@@ -266,6 +275,8 @@ class DeleteBookScreen(Screen):
             font_size=20,
             bold=True
         )
+        delete_button.bind(on_press=self.delete_selected_book)
+        layout.add_widget(delete_button)
 
         back_button = Button(text="Back to Main Menu")
         back_button.bind(on_press=self.go_back)
@@ -304,6 +315,8 @@ class SearchBookScreen(Screen):
             font_size=20,
             bold=True
         )
+        search_button.bind(on_press=self.search_books)
+        layout.add_widget(search_button)
 
         back_button = Button(text="Back to Main Menu", size_hint=(1, 0.3))
         back_button.bind(on_press=self.go_back)
@@ -384,14 +397,25 @@ class SearchBookScreen(Screen):
 
 class InventoryApp(App):
     def build(self):
-        sm = ScreenManager()
-        sm.add_widget(MainMenu(name="main_menu"))
-        sm.add_widget(BookInventoryScreen(name="book_inventory"))
-        sm.add_widget(UpdateBookScreen(name='update'))
-        sm.add_widget(DeleteBookScreen(name="delete"))
-        sm.add_widget(SearchBookScreen(name="search"))
+        root = BoxLayout(orientation='vertical')
 
-        return sm
+        # Add gradient background first
+        bg = GradientBackground()
+        root.add_widget(bg)
+
+        self.sm = ScreenManager()
+        self.sm.add_widget(MainMenu(name="main_menu"))
+        self.sm.add_widget(BookInventoryScreen(name="book_inventory"))
+        self.sm.add_widget(UpdateBookScreen(name='update'))
+        self.sm.add_widget(DeleteBookScreen(name="delete"))
+        self.sm.add_widget(SearchBookScreen(name="search"))
+
+        screen_layout = BoxLayout(orientation='vertical')
+        screen_layout.add_widget(self.sm)
+
+        root.add_widget(screen_layout)
+
+        return root
 
 if __name__ == '__main__':
     InventoryApp().run()
