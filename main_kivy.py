@@ -82,7 +82,7 @@ class UpdateBookScreen(Screen):
     def __init__(self, **kwargs):
         super(UpdateBookScreen, self).__init__(**kwargs) #update book class constructor
 
-        layout = BoxLayout(orientation='vertical', padding=20, spacing=20)
+        layout = BoxLayout(orientation='vertical', padding=10, spacing=10)
 
         self.book_id_input = TextInput(hint_text="Enter Book ID to update", multiline=False)
         self.new_book_name_input = TextInput(hint_text="Enter New Book Name", multiline=False)
@@ -149,11 +149,21 @@ class BookInventoryScreen(Screen):
         self.inventory = BookInventory()  # BookInventory is the existing form
         layout.add_widget(self.inventory)
 
-        back_button = Button(text="Back to Main Menu", size_hint=(1, 0.1))
+        back_button = Button(
+            text="Back to Main Menu",
+            background_color=(0, 0, 0, 1),
+            color=(1, 0.8, 0.9, 1),
+            font_size=20,
+            bold=True,
+            size_hint=(1, 0.1),
+            background_normal='',
+            background_down=''
+        )
         back_button.bind(on_press=self.go_back)
         layout.add_widget(back_button)
 
         self.add_widget(layout)
+
     def go_back(self,instance):
         self.manager.current = "main_menu"
 
@@ -164,6 +174,9 @@ class BookInventory(BoxLayout):
 
         self.conn = sqlite3.connect('angel_store.db')
         self.cursor = self.conn.cursor()
+
+        def create_label(text):
+            return Label(text=text, font_size=20, bold=True, color=(1, 1, 1, 1))
 
         self.add_widget(Label(text='Book Title'))
         self.title_input = TextInput()
@@ -181,15 +194,31 @@ class BookInventory(BoxLayout):
         self.quantity_input = TextInput()
         self.add_widget(self.quantity_input)
 
-        self.add_button = Button(text='Add Book')
+        self.add_button = Button(
+            text='Add Book',
+            background_color=(1, 0.6, 0.8, 1),
+            color=(0, 0, 0, 1),
+            font_size=20,
+            bold=True,
+            background_normal='',
+            background_down=''
+        )
         self.add_button.bind(on_press=self.add_book)
         self.add_widget(self.add_button)
 
-        self.show_button = Button(text='Show All Books')
+        self.show_button = Button(
+            text='Show All Books',
+            background_color=(0.4, 0.2, 0.6, 1),
+            color=(1, 1, 1, 1),
+            font_size=20,
+            bold=True,
+            background_normal='',
+            background_down=''
+        )
         self.show_button.bind(on_press=self.show_books)
         self.add_widget(self.show_button)
 
-        self.output = Label(text='')
+        self.output = Label(text='', font_size=16, color=(1, 1, 1, 1))
         self.add_widget(self.output)
 
 #enables me to add books here
@@ -221,44 +250,44 @@ class BookInventory(BoxLayout):
     def show_books(self, instance):
         self.cursor.execute("SELECT * FROM books")
         books = self.cursor.fetchall()
-
         if books:
-            # Creating a layout for the popup
-            layout = GridLayout(cols=5, spacing=10, size_hint_y=None, padding=[10,10])
+            layout = GridLayout(cols=5, spacing=10, size_hint_y=None, padding=[10, 10])
             layout.bind(minimum_height=layout.setter('height'))
-
-            # Add Header Titles
             headers = ["ID", "Title", "Genre", "Price", "Quantity"]
             for header in headers:
                 layout.add_widget(Label(
-                    text=f"[b]{header}[/b]", markup=True, halign="center", valign="middle",
-                    size_hint_y=None, height=20, text_size=(150, None)
+                    text=f"[b]{header}[/b]", markup=True, font_size=18, color=(1, 1, 1, 1),
+                    halign="center", valign="middle",
+                    size_hint_y=None, height=30, text_size=(150, None)
                 ))
-
-            # Adding each book as a Label
             for book in books:
-                layout.add_widget(Label(text=str(book[0]), halign="center", valign="middle", size_hint_y=None, height=40))
-                layout.add_widget(Label(text=book[1], halign="left", valign="middle", size_hint_y=None, height=40, text_size=(261, None)))
-                layout.add_widget(Label(text=book[2], halign="left", valign="middle", size_hint_y=None, height=40, text_size=(150, None)))
-                layout.add_widget(Label(text=str(book[3]), halign="center", valign="middle", size_hint_y=None, height=40))
-                layout.add_widget(Label(text=str(book[4]), halign="center", valign="middle", size_hint_y=None, height=40))
+                for field in book:
+                    layout.add_widget(Label(text=str(field), font_size=16, halign="center",
+                                            valign="middle", size_hint_y=None, height=40))
 
-            # Putting layout inside a scroll view
             scroll = ScrollView(size_hint=(1, 1))
             scroll.add_widget(layout)
-
-            #boxlayout for scroll-view + close button
             popup_layout = BoxLayout(orientation='vertical')
             popup_layout.add_widget(scroll)
-            close_button = Button(text="Close", size_hint=(1, 0.1))
-            popup_layout.add_widget(close_button)
-            popup = Popup(title= "Books in Inventory", content=popup_layout,
-                          size_hint=(0.95, 0.9))
-            close_button.bind(on_press=popup.dismiss)
-            popup.open()
 
+            close_button = Button(
+                text="Close",
+                background_color=(0, 0, 0, 1),
+                color=(1, 0.8, 0.9, 1),
+                font_size=18,
+                size_hint=(1, 0.1),
+                background_normal='',
+                background_down=''
+            )
+            close_button.bind(on_press=lambda x: popup.dismiss())
+            popup_layout.add_widget(close_button)
+
+            popup = Popup(title="Books in Inventory", content=popup_layout,
+                            size_hint=(0.95, 0.9), background_color=(0.5, 0.2, 0.7, 1))
+            popup.open()
         else:
-            self.output.text = "No books found in the inventory."
+            self.output.text = "No books found."
+
 
 class DeleteBookScreen(Screen):
     def __init__(self, **kwargs):
@@ -270,19 +299,28 @@ class DeleteBookScreen(Screen):
 
         delete_button = Button(
             text="Delete Book",
-            background_color=(0.8, 0.0, 0.2, 1),  # Cherry Red
+            background_color=(0.8, 0, 0.2, 1),
             color=(1, 1, 1, 1),
-            font_size=20,
-            bold=True
+            font_size=25,
+            bold=True,
+            background_normal='',
+            background_down=''
         )
         delete_button.bind(on_press=self.delete_selected_book)
         layout.add_widget(delete_button)
 
-        back_button = Button(text="Back to Main Menu")
+        back_button = Button(
+            text="Back to Main Menu",
+            background_color=(0, 0, 0, 1),
+            color=(1, 0.8, 0.9, 1),
+            font_size=20,
+            background_normal='',
+            background_down=''
+        )
         back_button.bind(on_press=self.go_back)
         layout.add_widget(back_button)
 
-        self.result_label = Label(text='')
+        self.result_label = Label(text='', font_size=18)
         layout.add_widget(self.result_label)
 
         self.add_widget(layout)
@@ -301,8 +339,7 @@ class DeleteBookScreen(Screen):
 #this is for searching
 class SearchBookScreen(Screen):
     def __init__(self, **kwargs):
-        super(SearchBookScreen, self).__init__(**kwargs)
-
+        super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=20, spacing=20)
 
         self.search_input = TextInput(hint_text="Enter Title or Genre to search", multiline=False)
@@ -310,15 +347,24 @@ class SearchBookScreen(Screen):
 
         search_button = Button(
             text="Search",
-            background_color=(1, 0.6, 0.8, 1),  # Soft Pink
+            background_color=(1, 0.6, 0.8, 1),
             color=(0, 0, 0, 1),
-            font_size=20,
-            bold=True
+            font_size=27,
+            bold=True,
+            background_normal='',
+            background_down=''
         )
         search_button.bind(on_press=self.search_books)
         layout.add_widget(search_button)
 
-        back_button = Button(text="Back to Main Menu", size_hint=(1, 0.3))
+        back_button = Button(
+            text="Back to Main Menu",
+            background_color=(0, 0, 0, 1),
+            color=(1, 0.8, 0.9, 1),
+            font_size=20,
+            background_normal='',
+            background_down=''
+        )
         back_button.bind(on_press=self.go_back)
         layout.add_widget(back_button)
 
@@ -332,62 +378,60 @@ class SearchBookScreen(Screen):
         if not search_text:
             self.show_popup("No Input", "Please enter a title or genre to search.")
             return
-
         title_matches = search_book_by_title(search_text)
         genre_matches = search_book_by_genre(search_text)
         results = title_matches + genre_matches
 
         if results:
-            layout = GridLayout(cols=5, spacing=10, size_hint_y=None, padding=[10, 10])
+            layout = GridLayout(cols=5, spacing=10, size_hint_y=None, padding=[10,10])
             layout.bind(minimum_height=layout.setter('height'))
-
-            # Add Headers
             headers = ["ID", "Title", "Genre", "Price", "Quantity"]
             for header in headers:
                 layout.add_widget(Label(
-                    text=f"[b]{header}[/b]", markup=True, halign="center", valign="middle",
-                    size_hint_y=None, height=30, text_size=(150, None)
+                    text=f"[b]{header}[/b]", markup=True, font_size=18,
+                    halign="center", valign="middle", size_hint_y=None, height=30, text_size=(150, None)
                 ))
-
-            # Add Book Details
             for book in results:
-                layout.add_widget(
-                    Label(text=str(book[0]), halign="center", valign="middle", size_hint_y=None, height=40))
-                layout.add_widget(Label(text=book[1], halign="left", valign="middle", size_hint_y=None, height=40,
-                                        text_size=(261, None)))
-                layout.add_widget(Label(text=book[2], halign="left", valign="middle", size_hint_y=None, height=40,
-                                        text_size=(150, None)))
-                layout.add_widget(
-                    Label(text=str(book[3]), halign="center", valign="middle", size_hint_y=None, height=40))
-                layout.add_widget(
-                    Label(text=str(book[4]), halign="center", valign="middle", size_hint_y=None, height=40))
+                for field in book:
+                    layout.add_widget(Label(text=str(field), font_size=16, halign="center",
+                                            valign="middle", size_hint_y=None, height=40))
 
-            # ScrollView to make it scrollable
             scroll = ScrollView(size_hint=(1, 1))
             scroll.add_widget(layout)
-
             popup_layout = BoxLayout(orientation='vertical')
             popup_layout.add_widget(scroll)
 
-            close_button = Button(text="Close", size_hint=(1, 0.1))
+            close_button = Button(
+                text="Close",
+                background_color=(0, 0, 0, 1),
+                color=(1, 0.8, 0.9, 1),
+                font_size=18,
+                background_normal='',
+                background_down=''
+            )
+            close_button.bind(on_press=lambda x: popup.dismiss())
             popup_layout.add_widget(close_button)
 
             popup = Popup(title="Search Results", content=popup_layout,
-                          size_hint=(0.95, 0.9))
-            close_button.bind(on_press=popup.dismiss)
+                          size_hint=(0.95, 0.9), background_color=(0.5, 0.2, 0.7, 1))
             popup.open()
-
         else:
             self.show_popup("No Results", "No matching books found.")
 
     def show_popup(self, title, message):
-        popup_content = BoxLayout(orientation='vertical', padding=50, spacing=50)
-        popup_content.add_widget(Label(text=message))
-
-        close_button = Button(text="Close", size_hint=(1, 0.2))
+        popup_content = BoxLayout(orientation='vertical', padding=20, spacing=20)
+        popup_content.add_widget(Label(text=message, font_size=18))
+        close_button = Button(
+            text="Close",
+            background_color=(0, 0, 0, 1),
+            color=(1, 0.8, 0.9, 1),
+            size_hint=(1, 0.2),
+            font_size=18,
+            background_normal='',
+            background_down=''
+        )
         popup_content.add_widget(close_button)
-
-        popup = Popup(title=title, content=popup_content, size_hint=(0.9, 0.4))
+        popup = Popup(title=title, content=popup_content, size_hint=(0.8, 0.5))
         close_button.bind(on_press=popup.dismiss)
         popup.open()
 
@@ -396,6 +440,10 @@ class SearchBookScreen(Screen):
 
 
 class InventoryApp(App):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.sm = None
+
     def build(self):
         root = BoxLayout(orientation='vertical')
 
