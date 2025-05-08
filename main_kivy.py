@@ -15,57 +15,95 @@ from INVENTORY import delete_book, search_book_by_title, search_book_by_genre
 from kivy.uix.widget import Widget
 from kivy.graphics import Rectangle, Color
 from kivy.core.window import Window
+from kivy.uix.relativelayout import RelativeLayout
 
-
-# Gradient background
-class GradientBackground(Widget):
+#gradient background
+class GradientBackground(RelativeLayout):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         with self.canvas.before:
-            Color(0.5, 0.2, 0.7, 1)  # Deep purple
-            self.rect = Rectangle(size=Window.size, pos=self.pos)
+            Color(0.5, 0.2, 0.7, 1)  # Purple color
+            self.rect = Rectangle(size=self.size, pos=self.pos)
+
         self.bind(size=self.update_rect, pos=self.update_rect)
-        Window.bind(size=self.update_rect)
 
     def update_rect(self, *args):
-        self.rect.size = Window.size
+        self.rect.size = self.size
         self.rect.pos = self.pos
+
 
 class MainMenu(Screen):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         layout = BoxLayout(orientation='vertical', padding=50, spacing=20)
 
-        # Common button style
-        def create_button(text, bg_color, text_color):
-            return Button(
-                text=text,
-                background_color=bg_color,
-                color=text_color,
-                font_size=22,
-                bold=True,
-                size_hint=(1, 0.2),
-                background_normal='',
-                background_down=''
-            )
-
-        manage_button = create_button("Manage Books", (1, 0.75, 0.8, 1), (0, 0, 0, 1))  # pink bg, black text
+        # Manage Books Button
+        manage_button = Button(
+            text="Manage Books",
+            background_color=(0.9, 0.2, 0.9, 2),  # Deep Purple
+            color=(1, 1, 1, 1),
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2),
+            background_normal='',
+            background_down=''
+        )
         manage_button.bind(on_press=self.go_to_books)
         layout.add_widget(manage_button)
 
-        update_button = create_button("Update Book", (1, 0.75, 0.8, 1), (0, 0, 0, 1))
+        # Update Book Button
+        update_button = Button(
+            text="Update Book",
+            background_color=(1, 0.6, 0.8, 1),  # Soft Pink
+            color=(0, 0, 0, 1),
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2),
+            background_normal='',
+            background_down=''
+        )
         update_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'update'))
         layout.add_widget(update_button)
 
-        delete_button = create_button("Delete Book", (0.8, 0, 0.2, 1), (1, 1, 1, 1))  # red bg, white text
+        # Delete Book Button
+        delete_button = Button(
+            text="Delete Book",
+            background_color=(0.8, 0.0, 0.2, 1),  # Cherry Red
+            color=(1, 1, 1, 1),
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2),
+            background_normal='',
+            background_down=''
+        )
         delete_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'delete'))
         layout.add_widget(delete_button)
 
-        search_button = create_button("Search Book", (1, 0.75, 0.8, 1), (0, 0, 0, 1))
+        # Search Book Button
+        search_button = Button(
+            text="Search Book",
+            background_color=(1, 0.6, 0.8, 1),  # Soft Pink
+            color=(0, 0, 0, 1),
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2),
+            background_normal='',
+            background_down=''
+        )
         search_button.bind(on_press=lambda x: setattr(self.manager, 'current', 'search'))
         layout.add_widget(search_button)
 
-        exit_button = create_button("Exit", (0, 0, 0, 1), (1, 0.8, 0.9, 1))  # black bg, pink text
+        # Exit Button
+        exit_button = Button(
+            text="Exit",
+            background_color=(0, 0, 0, 1),  # Black
+            color=(1, 0.8, 0.9, 1),  # Light pink text
+            font_size=22,
+            bold=True,
+            size_hint=(1, 0.2),
+            background_normal='',
+            background_down=''
+        )
         exit_button.bind(on_press=lambda x: App.get_running_app().stop())
         layout.add_widget(exit_button)
 
@@ -440,14 +478,9 @@ class SearchBookScreen(Screen):
 
 
 class InventoryApp(App):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-        self.sm = None
-
     def build(self):
-        root = BoxLayout(orientation='vertical')
+        root = RelativeLayout()
 
-        # Add gradient background first
         bg = GradientBackground()
         root.add_widget(bg)
 
@@ -458,10 +491,7 @@ class InventoryApp(App):
         self.sm.add_widget(DeleteBookScreen(name="delete"))
         self.sm.add_widget(SearchBookScreen(name="search"))
 
-        screen_layout = BoxLayout(orientation='vertical')
-        screen_layout.add_widget(self.sm)
-
-        root.add_widget(screen_layout)
+        root.add_widget(self.sm)  # Add ScreenManager ON TOP of background
 
         return root
 
